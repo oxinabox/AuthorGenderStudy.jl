@@ -95,7 +95,4 @@ https://www.semanticscholar.org/paper/09e3cf5704bcb16e6657f6ceed70e93373a54618
           corpus-2018-05-03/s2-corpus-39.gz"""),
     "https://s3-us-west-2.amazonaws.com/ai2-s2-research-public/open-corpus/license.txt"
     ];
-
-
-    post_fetch_method=[unpack, identity] # unpack the first set, do nothing the license file
 ))

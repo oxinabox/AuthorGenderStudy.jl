@@ -1,6 +1,16 @@
-__precompile__()
+#__precompile__()
 module AuthorGenderStudy
 
-# Package code goes here.
+using Libz
+using JSON
+using Glob
+using DataDeps
+using NamedTuples
+
+function __init__()
+    include("init_datadeps.jl")
+end
+
+include("load_data.jl")
 
 end
