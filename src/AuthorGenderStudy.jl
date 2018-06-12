@@ -9,6 +9,7 @@ using NamedTuples
 using InternedStrings
 using NameToGender
 using WordTokenizers
+using Missings
 
 function __init__()
     include("init_datadeps.jl")
