@@ -1,4 +1,20 @@
-const BUFFER_SIZE = 2^6
+const BUFFER_SIZE = 2^16
+
+
+function distributed_channel_load(fileload_func, filenames; ctype=Any, csize=BUFFER_SIZE)
+    Channel(ctype=ctype, csize=csize) do local_ch
+		remote_ch = RemoteChannel(()->local_ch)
+
+		c_pool = CachingPool(workers())
+		file_dones = remotecall.(fileload_func, c_pool, remote_ch, filenames)
+
+		# Wait till all the all files are done
+		for file_done in file_dones
+			wait(file_done)
+		end 
+		clear!(c_pool)
+	end
+end
 
 
 function load_data(datadir = datadep"Open Research Corpus")
@@ -10,8 +26,8 @@ function load_data(datadir = datadep"Open Research Corpus")
         )
     end
 
-    function process_file(ch, fn)
-        for line in eachline(ZlibInflateInputStream(open(fn)))
+   distributed_channel_load(glob("*.gz", datadir)) do ch, fn
+	   for line in eachline(ZlibInflateInputStream(open(fn)))
             datum = extract_data(line)
 
             #println(datum.authors)
@@ -34,36 +50,6 @@ function load_data(datadir = datadep"Open Research Corpus")
                          paper_abstract=paper_abstract))
 
         end
-    end
-
-    ##################
-    # Actual function 
-
-    local_ch = Channel{Any}(BUFFER_SIZE)
-    remote_ch = RemoteChannel(()->local_ch)
-
-    c_pool = CachingPool(workers())
-    filenames = glob("*.gz", datadir)
-    file_dones = remotecall.(process_file, c_pool, remote_ch, filenames)
-    
-
-    # schedule the following to occur at some point on the local worker
-    @schedule begin # Close off the channel once all files are done
-        for file_done in file_dones
-            wait(file_done)
-        end # wait for all of them
-        close(local_ch)
-        clear!(c_pool)
-    end
-
-    return local_ch
-end
-
-
-function preprocess_data(data = load_data())
-    Channel(ctype=Any, csize=BUFFER_SIZE) do ch
-        for datum in data
-       end
     end
 end
 
