@@ -1,7 +1,8 @@
-const BUFFER_SIZE = 2^16
+const BUFFER_SIZE = 2^10
 
 
-function distributed_channel_load(fileload_func, filenames; ctype=Any, csize=BUFFER_SIZE)
+function distributed_channel_load(fileload_func, filenames; 
+                                  ctype=Any, csize=BUFFER_SIZE)
     Channel(ctype=ctype, csize=csize) do local_ch
 		remote_ch = RemoteChannel(()->local_ch)
 
@@ -11,7 +12,7 @@ function distributed_channel_load(fileload_func, filenames; ctype=Any, csize=BUF
 		# Wait till all the all files are done
 		for file_done in file_dones
 			wait(file_done)
-		end 
+		end
 		clear!(c_pool)
 	end
 end

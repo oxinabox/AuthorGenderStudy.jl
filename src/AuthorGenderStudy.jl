@@ -16,7 +16,7 @@ function __init__()
 end
 
 
-export load_data, preprocess_data
+export load_data
 
 include("load_data.jl")
 
